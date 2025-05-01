@@ -213,3 +213,5 @@ module_init(sched_tp_init);
 module_exit(sched_tp_finish);
 
 MODULE_LICENSE("GPL");
+MODULE_DESCRIPTION("Instantiates scheduler tracepoints");
+

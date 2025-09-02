@@ -198,6 +198,30 @@ static void sched_set_need_resched(void *data, struct task_struct *tsk, int cpu,
 }
 #endif
 
+static void sched_dl_throttle(void *data, struct sched_dl_entity *dl, int cpu)
+{
+	if (trace_sched_dl_throttle_enabled())
+		trace_sched_dl_throttle(dl, cpu);
+}
+
+static void sched_dl_replenish(void *data, struct sched_dl_entity *dl, int cpu)
+{
+	if (trace_sched_dl_replenish_enabled())
+		trace_sched_dl_replenish(dl, cpu);
+}
+
+static void sched_dl_server_start(void *data, struct sched_dl_entity *dl, int cpu)
+{
+	if (trace_sched_dl_server_start_enabled())
+		trace_sched_dl_server_start(dl, cpu);
+}
+
+static void sched_dl_server_stop(void *data, struct sched_dl_entity *dl, int cpu)
+{
+	if (trace_sched_dl_server_stop_enabled())
+		trace_sched_dl_server_stop(dl, cpu);
+}
+
 static int sched_tp_init(void)
 {
 	register_trace_pelt_cfs_tp(sched_pelt_cfs, NULL);
@@ -222,6 +246,10 @@ static int sched_tp_init(void)
 	register_trace_sched_entry_tp(sched_entry, NULL);
 	register_trace_sched_exit_tp(sched_exit, NULL);
 #endif
+	register_trace_sched_dl_throttle_tp(sched_dl_throttle, NULL);
+	register_trace_sched_dl_replenish_tp(sched_dl_replenish, NULL);
+	register_trace_sched_dl_server_start_tp(sched_dl_server_start, NULL);
+	register_trace_sched_dl_server_stop_tp(sched_dl_server_stop, NULL);
 
 	return 0;
 }
@@ -250,6 +278,10 @@ static void sched_tp_finish(void)
 	unregister_trace_sched_entry_tp(sched_entry, NULL);
 	unregister_trace_sched_exit_tp(sched_exit, NULL);
 #endif
+	unregister_trace_sched_dl_throttle_tp(sched_dl_throttle, NULL);
+	unregister_trace_sched_dl_replenish_tp(sched_dl_replenish, NULL);
+	unregister_trace_sched_dl_server_start_tp(sched_dl_server_start, NULL);
+	unregister_trace_sched_dl_server_stop_tp(sched_dl_server_stop, NULL);
 }
 
 

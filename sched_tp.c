@@ -198,6 +198,32 @@ static void sched_set_need_resched(void *data, struct task_struct *tsk, int cpu,
 }
 #endif
 
+#if 1 //LINUX_VERSION_CODE >= KERNEL_VERSION(7,1,0)
+static void sched_dl_throttle(void *data, struct sched_dl_entity *dl, int cpu, uint8_t type)
+{
+	if (trace_sched_dl_throttle_enabled())
+		trace_sched_dl_throttle(dl, cpu, type);
+}
+
+static void sched_dl_replenish(void *data, struct sched_dl_entity *dl, int cpu, uint8_t type)
+{
+	if (trace_sched_dl_replenish_enabled())
+		trace_sched_dl_replenish(dl, cpu, type);
+}
+
+static void sched_dl_server_start(void *data, struct sched_dl_entity *dl, int cpu, uint8_t type)
+{
+	if (trace_sched_dl_server_start_enabled())
+		trace_sched_dl_server_start(dl, cpu, type);
+}
+
+static void sched_dl_server_stop(void *data, struct sched_dl_entity *dl, int cpu, uint8_t type)
+{
+	if (trace_sched_dl_server_stop_enabled())
+		trace_sched_dl_server_stop(dl, cpu, type);
+}
+#endif
+
 static int sched_tp_init(void)
 {
 	register_trace_pelt_cfs_tp(sched_pelt_cfs, NULL);
@@ -221,6 +247,12 @@ static int sched_tp_init(void)
 	register_trace_sched_set_need_resched_tp(sched_set_need_resched, NULL);
 	register_trace_sched_entry_tp(sched_entry, NULL);
 	register_trace_sched_exit_tp(sched_exit, NULL);
+#endif
+#if 1 //LINUX_VERSION_CODE >= KERNEL_VERSION(7,1,0)
+	register_trace_sched_dl_throttle_tp(sched_dl_throttle, NULL);
+	register_trace_sched_dl_replenish_tp(sched_dl_replenish, NULL);
+	register_trace_sched_dl_server_start_tp(sched_dl_server_start, NULL);
+	register_trace_sched_dl_server_stop_tp(sched_dl_server_stop, NULL);
 #endif
 
 	return 0;
@@ -249,6 +281,12 @@ static void sched_tp_finish(void)
 	unregister_trace_sched_set_need_resched_tp(sched_set_need_resched, NULL);
 	unregister_trace_sched_entry_tp(sched_entry, NULL);
 	unregister_trace_sched_exit_tp(sched_exit, NULL);
+#endif
+#if 1 //LINUX_VERSION_CODE >= KERNEL_VERSION(7,1,0)
+	unregister_trace_sched_dl_throttle_tp(sched_dl_throttle, NULL);
+	unregister_trace_sched_dl_replenish_tp(sched_dl_replenish, NULL);
+	unregister_trace_sched_dl_server_start_tp(sched_dl_server_start, NULL);
+	unregister_trace_sched_dl_server_stop_tp(sched_dl_server_stop, NULL);
 #endif
 }
 

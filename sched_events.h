@@ -242,12 +242,13 @@ TRACE_EVENT(sched_util_est_cfs,
 
 DECLARE_EVENT_CLASS(sched_dl_template,
 
-	TP_PROTO(struct sched_dl_entity *dl, int cpu),
+	TP_PROTO(struct sched_dl_entity *dl, int cpu, uint8_t type),
 
-	TP_ARGS(dl, cpu),
+	TP_ARGS(dl, cpu, type),
 
 	TP_STRUCT__entry(
 		__string( comm,		dl->dl_server ? "server" : container_of(dl, struct task_struct, dl)->comm	)
+		__field(  u8,		type		)
 		__field(  pid_t,	pid		)
 		__field(  s64,		runtime		)
 		__field(  u64,		deadline	)
@@ -257,32 +258,33 @@ DECLARE_EVENT_CLASS(sched_dl_template,
 	TP_fast_assign(
 		__assign_str(comm);
 		__entry->pid		= dl->dl_server ? -cpu : container_of(dl, struct task_struct, dl)->pid;
+		__entry->type		= type;
 		__entry->runtime	= dl->runtime;
 		__entry->deadline	= dl->deadline;
 		__entry->dl_yielded	= dl->dl_yielded;
 	),
 
-	TP_printk("comm=%s pid=%d runtime=%lld deadline=%llu yielded=%d",
-			__get_str(comm), __entry->pid,
+	TP_printk("comm=%s pid=%d type=%d runtime=%lld deadline=%llu yielded=%d",
+			__get_str(comm), __entry->pid, __entry->type,
 			__entry->runtime, __entry->deadline,
 			__entry->dl_yielded)
 );
 
 DEFINE_EVENT(sched_dl_template, sched_dl_throttle,
-	TP_PROTO(struct sched_dl_entity *dl, int cpu),
-	TP_ARGS(dl, cpu));
+	TP_PROTO(struct sched_dl_entity *dl, int cpu, uint8_t type),
+	TP_ARGS(dl, cpu, type));
 
 DEFINE_EVENT(sched_dl_template, sched_dl_replenish,
-	TP_PROTO(struct sched_dl_entity *dl, int cpu),
-	TP_ARGS(dl, cpu));
+	TP_PROTO(struct sched_dl_entity *dl, int cpu, uint8_t type),
+	TP_ARGS(dl, cpu, type));
 
 DEFINE_EVENT(sched_dl_template, sched_dl_server_start,
-	TP_PROTO(struct sched_dl_entity *dl, int cpu),
-	TP_ARGS(dl, cpu));
+	TP_PROTO(struct sched_dl_entity *dl, int cpu, uint8_t type),
+	TP_ARGS(dl, cpu, type));
 
 DEFINE_EVENT(sched_dl_template, sched_dl_server_stop,
-	TP_PROTO(struct sched_dl_entity *dl, int cpu),
-	TP_ARGS(dl, cpu));
+	TP_PROTO(struct sched_dl_entity *dl, int cpu, uint8_t type),
+	TP_ARGS(dl, cpu, type));
 
 #ifdef CONFIG_UCLAMP_TASK
 

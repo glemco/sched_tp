@@ -198,28 +198,28 @@ static void sched_set_need_resched(void *data, struct task_struct *tsk, int cpu,
 }
 #endif
 
-static void sched_dl_throttle(void *data, struct sched_dl_entity *dl, int cpu)
+static void sched_dl_throttle(void *data, struct sched_dl_entity *dl, int cpu, uint8_t type)
 {
 	if (trace_sched_dl_throttle_enabled())
-		trace_sched_dl_throttle(dl, cpu);
+		trace_sched_dl_throttle(dl, cpu, type);
 }
 
-static void sched_dl_replenish(void *data, struct sched_dl_entity *dl, int cpu)
+static void sched_dl_replenish(void *data, struct sched_dl_entity *dl, int cpu, uint8_t type)
 {
 	if (trace_sched_dl_replenish_enabled())
-		trace_sched_dl_replenish(dl, cpu);
+		trace_sched_dl_replenish(dl, cpu, type);
 }
 
-static void sched_dl_server_start(void *data, struct sched_dl_entity *dl, int cpu)
+static void sched_dl_server_start(void *data, struct sched_dl_entity *dl, int cpu, uint8_t type)
 {
 	if (trace_sched_dl_server_start_enabled())
-		trace_sched_dl_server_start(dl, cpu);
+		trace_sched_dl_server_start(dl, cpu, type);
 }
 
-static void sched_dl_server_stop(void *data, struct sched_dl_entity *dl, int cpu)
+static void sched_dl_server_stop(void *data, struct sched_dl_entity *dl, int cpu, uint8_t type)
 {
 	if (trace_sched_dl_server_stop_enabled())
-		trace_sched_dl_server_stop(dl, cpu);
+		trace_sched_dl_server_stop(dl, cpu, type);
 }
 
 static int sched_tp_init(void)

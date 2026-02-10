@@ -170,6 +170,34 @@ static void sched_cpu_capacity(void *data, struct rq *rq)
 }
 #endif
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,15,0)
+static void sched_set_state(void *data, struct task_struct *tsk, int state)
+{
+	if (trace_sched_set_state_enabled())
+		trace_sched_set_state(tsk, state);
+}
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,19,0)
+static void sched_entry(void *data, bool preempt)
+{
+	if (trace_sched_entry_enabled())
+		trace_sched_entry(preempt);
+}
+
+static void sched_exit(void *data, bool is_switch)
+{
+	if (trace_sched_exit_enabled())
+		trace_sched_exit(is_switch);
+}
+
+static void sched_set_need_resched(void *data, struct task_struct *tsk, int cpu, int tif)
+{
+	if (trace_sched_set_need_resched_enabled())
+		trace_sched_set_need_resched(tsk, cpu, tif);
+}
+#endif
+
 static int sched_tp_init(void)
 {
 	register_trace_pelt_cfs_tp(sched_pelt_cfs, NULL);
@@ -185,6 +213,14 @@ static int sched_tp_init(void)
 #endif
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0)
 	register_trace_sched_cpu_capacity_tp(sched_cpu_capacity, NULL);
+#endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,15,0)
+	register_trace_sched_set_state_tp(sched_set_state, NULL);
+#endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,19,0)
+	register_trace_sched_set_need_resched_tp(sched_set_need_resched, NULL);
+	register_trace_sched_entry_tp(sched_entry, NULL);
+	register_trace_sched_exit_tp(sched_exit, NULL);
 #endif
 
 	return 0;
@@ -205,6 +241,14 @@ static void sched_tp_finish(void)
 #endif
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0)
 	unregister_trace_sched_cpu_capacity_tp(sched_cpu_capacity, NULL);
+#endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,15,0)
+	unregister_trace_sched_set_state_tp(sched_set_state, NULL);
+#endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,19,0)
+	unregister_trace_sched_set_need_resched_tp(sched_set_need_resched, NULL);
+	unregister_trace_sched_entry_tp(sched_entry, NULL);
+	unregister_trace_sched_exit_tp(sched_exit, NULL);
 #endif
 }
 

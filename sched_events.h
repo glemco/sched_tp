@@ -356,6 +356,109 @@ TRACE_EVENT(sched_cpu_capacity,
 );
 #endif
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,15,0)
+
+#define state_to_flag(state) (state & (TASK_REPORT_MAX - 1)) ? \
+		  __print_flags(state & (TASK_REPORT_MAX - 1), "|", \
+				{ TASK_INTERRUPTIBLE, "S" }, \
+				{ TASK_UNINTERRUPTIBLE, "D" }, \
+				{ __TASK_STOPPED, "T" }, \
+				{ __TASK_TRACED, "t" }, \
+				{ EXIT_DEAD, "X" }, \
+				{ EXIT_ZOMBIE, "Z" }, \
+				{ TASK_PARKED, "P" }, \
+				{ TASK_DEAD, "I" }) : \
+		  "R"
+
+TRACE_EVENT(sched_set_state,
+
+	TP_PROTO(struct task_struct *tsk, int state),
+
+	TP_ARGS(tsk, state),
+
+	TP_STRUCT__entry(
+		__string(	comm,	tsk->comm	)
+		__field(	pid_t,	pid		)
+		__field(	int,	prev_state	)
+		__field(	int,	state		)
+	),
+
+	TP_fast_assign(
+		__assign_str(comm);
+		__entry->pid		= tsk->pid;
+		__entry->prev_state	= tsk->__state;
+		__entry->state		= state;
+	),
+
+	TP_printk("comm=%s pid=%d %s => %s",
+		  __get_str(comm), __entry->pid, state_to_flag(__entry->prev_state),
+		  state_to_flag(__entry->state))
+);
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,19,0)
+TRACE_EVENT(sched_entry,
+
+	TP_PROTO(bool preempt),
+
+	TP_ARGS(preempt),
+
+	TP_STRUCT__entry(
+		__field(	bool,	preempt		)
+	),
+
+	TP_fast_assign(
+		__entry->preempt	= preempt;
+	),
+
+	TP_printk("with%s preemption", __entry->preempt ? "" : "out")
+);
+
+TRACE_EVENT(sched_exit,
+
+	TP_PROTO(bool is_switch),
+
+	TP_ARGS(is_switch),
+
+	TP_STRUCT__entry(
+		__field(	bool,	is_switch		)
+	),
+
+	TP_fast_assign(
+		__entry->is_switch	= is_switch;
+	),
+
+	TP_printk("with%s switch", __entry->is_switch ? "" : "out")
+);
+
+TRACE_EVENT(sched_set_need_resched,
+
+	TP_PROTO(struct task_struct *tsk, int cpu, int tif),
+
+	TP_ARGS(tsk, cpu, tif),
+
+	TP_STRUCT__entry(
+		__string(	comm,	tsk->comm	)
+		__field(	pid_t,	pid		)
+		__field(	int,	cpu		)
+		__field(	int,	tif		)
+	),
+
+	TP_fast_assign(
+		__assign_str(comm);
+		__entry->pid		= tsk->pid;
+		__entry->cpu		= cpu;
+		__entry->tif		= tif;
+	),
+
+	TP_printk("comm=%s pid=%d cpu=%d %s",
+		  __get_str(comm), __entry->pid, __entry->cpu,
+		  __print_symbolic(__entry->tif,
+				   {TIF_NEED_RESCHED, "TIF_NR"},
+				   {TIF_NEED_RESCHED_LAZY, "TIF_NR_LAZY"}))
+);
+#endif
+
 #endif /* _SCHED_EVENTS_H */
 
 /* This part must be outside protection */

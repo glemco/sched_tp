@@ -222,6 +222,18 @@ static void sched_dl_server_stop(void *data, struct sched_dl_entity *dl, int cpu
 	if (trace_sched_dl_server_stop_enabled())
 		trace_sched_dl_server_stop(dl, cpu, type);
 }
+
+static void sched_enqueue(void *data, struct task_struct *tsk, int cpu)
+{
+	if (trace_sched_enqueue_enabled())
+		trace_sched_enqueue(tsk, cpu);
+}
+
+static void sched_dequeue(void *data, struct task_struct *tsk, int cpu)
+{
+	if (trace_sched_dequeue_enabled())
+		trace_sched_dequeue(tsk, cpu);
+}
 #endif
 
 static int sched_tp_init(void)
@@ -253,6 +265,8 @@ static int sched_tp_init(void)
 	register_trace_sched_dl_replenish_tp(sched_dl_replenish, NULL);
 	register_trace_sched_dl_server_start_tp(sched_dl_server_start, NULL);
 	register_trace_sched_dl_server_stop_tp(sched_dl_server_stop, NULL);
+	register_trace_sched_enqueue_tp(sched_enqueue, NULL);
+	register_trace_sched_dequeue_tp(sched_dequeue, NULL);
 #endif
 
 	return 0;
@@ -287,6 +301,8 @@ static void sched_tp_finish(void)
 	unregister_trace_sched_dl_replenish_tp(sched_dl_replenish, NULL);
 	unregister_trace_sched_dl_server_start_tp(sched_dl_server_start, NULL);
 	unregister_trace_sched_dl_server_stop_tp(sched_dl_server_stop, NULL);
+	unregister_trace_sched_enqueue_tp(sched_enqueue, NULL);
+	unregister_trace_sched_dequeue_tp(sched_dequeue, NULL);
 #endif
 }
 

@@ -505,6 +505,36 @@ DEFINE_EVENT(sched_dl_template, sched_dl_server_start,
 DEFINE_EVENT(sched_dl_template, sched_dl_server_stop,
 	TP_PROTO(struct sched_dl_entity *dl, int cpu, uint8_t type),
 	TP_ARGS(dl, cpu, type));
+
+DECLARE_EVENT_CLASS(sched_queue_template,
+
+	TP_PROTO(struct task_struct *tsk, int cpu),
+
+	TP_ARGS(tsk, cpu),
+
+	TP_STRUCT__entry(
+		__string(	comm,	tsk->comm	)
+		__field(	pid_t,	pid		)
+		__field(	int,	cpu		)
+	),
+
+	TP_fast_assign(
+		__assign_str(comm);
+		__entry->pid		= tsk->pid;
+		__entry->cpu		= cpu;
+	),
+
+	TP_printk("comm=%s pid=%d cpu=%d",
+		  __get_str(comm), __entry->pid, __entry->cpu)
+);
+
+DEFINE_EVENT(sched_queue_template, sched_enqueue,
+	TP_PROTO(struct task_struct *tsk, int cpu),
+	TP_ARGS(tsk, cpu));
+
+DEFINE_EVENT(sched_queue_template, sched_dequeue,
+	TP_PROTO(struct task_struct *tsk, int cpu),
+	TP_ARGS(tsk, cpu));
 #endif
 
 #endif /* _SCHED_EVENTS_H */
